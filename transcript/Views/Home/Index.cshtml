@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    Layout = "_Layout";
+
+    var dt = ViewBag.DT;
+    string selected = "";
+}
+@model stu
+
+<div>
+    <h3>選取</h3>
+    <form method="post" action="~/Home/generate">
+    <select asp-for="stuno">
+    @for (int i = 0; i < dt.Rows.Count; i++)
+    {
+            <option value="@Html.Raw(dt.Rows[i]["stuno"])">@Html.Raw(dt.Rows[i]["name"])</option>
+    }
+    </select>
+    <input type="submit" />
+    </form>
+</div>

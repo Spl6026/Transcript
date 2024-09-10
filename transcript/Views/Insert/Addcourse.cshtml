@@ -1,0 +1,112 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var dt1 = ViewBag.DT1;
+    var dt2 = ViewBag.DT2;
+}
+@model stu_crs
+
+<div>
+    <h3>新增</h3>
+    <form method="post" action="~/insert/course" autocomplete="off">
+        學生：
+        <select asp-for="stuno" class="stuno">
+            @for (int i = 0; i < dt1.Rows.Count; i++)
+            {
+                <option value="@Html.Raw(dt1.Rows[i]["stuno"])">@Html.Raw(dt1.Rows[i]["name"])</option>
+            }
+        </select>
+
+        學年：<input type="text" asp-for="year" />
+        學期：<input type="text" asp-for="semester" />
+
+        <select asp-for="stu_course_no">
+            @for (int i = 0; i < dt2.Rows.Count; i++)
+            {
+                <option value="@Html.Raw(dt2.Rows[i]["cono"])">@Html.Raw(dt2.Rows[i]["chinese_co"])</option>
+            }
+        </select>
+
+        成績：<input type="text" asp-for="stu_course_score" />
+
+        <input type="submit" />
+    </form>
+
+    <h3>修課成績列表</h3>
+    <div>
+        <table class ="list">
+        </table>
+    </div>
+</div>
+<script>
+    class crs {
+        constructor(name, cono, year, sem, score, stuno) {
+            this.Name = document.createElement('td');
+            this.Name.textContent = name;
+            this.Cono = document.createElement('td');
+            this.Cono.textContent = cono;
+            this.Cono.classList.add("cono");
+            this.Year = document.createElement('td');
+            this.Year.textContent = year;
+            this.Year.classList.add("year");
+            this.Sem = document.createElement('td');
+            this.Sem.textContent = sem;
+            this.Sem.classList.add("sem");
+            this.Score = document.createElement('td');
+            this.Score.textContent = score;
+            this.Delete = document.createElement('button');
+            this.Delete.setAttribute('onclick', 'del(this)');
+            this.Delete.setAttribute('value', stuno);
+            this.Delete.textContent = '刪除';
+        }
+    }
+
+    function del(e) {
+        var json = {};
+        json.stuno = e.parentNode.querySelector("button").value;
+        json.year = e.parentNode.querySelector(".year").innerHTML;
+        json.semester = e.parentNode.querySelector(".sem").innerHTML;
+        json.stu_course_no = e.parentNode.querySelector(".cono").innerHTML;
+        e.parentNode.remove();
+        console.log(e.parentNode)
+        fetch('@Url.Action("DelStuCrs")', {
+            mode: 'cors',
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(json)
+        })
+    }
+
+    document.querySelector(".stuno").addEventListener('change', (e) => {
+        document.querySelector(".list").innerHTML = "<tr><th>課程</th><th>課程代碼</th><th>學年</th><th>學期</th><th>成績</th></tr>";
+        fetch('@Url.Action("GetStuCrs")', {
+            mode: 'cors',
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(e.target.value)
+        }).then((res) => { 
+            return res.json();
+        }).then((data) => {
+            for (var item of data) {
+                var Course = new crs(item.chinese_co, item.stu_course_no, item.year, item.semester, item.stu_course_score, item.stuno);
+                var child = document.createElement("tr");
+                child.appendChild(Course.Name);
+                child.appendChild(Course.Cono);
+                child.appendChild(Course.Year);
+                child.appendChild(Course.Sem);
+                child.appendChild(Course.Score);
+                child.appendChild(Course.Delete);
+                console.log(child)
+                document.querySelector(".list").appendChild(child);
+            }
+
+        })
+    })
+</script>

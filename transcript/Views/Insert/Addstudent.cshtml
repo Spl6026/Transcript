@@ -1,0 +1,18 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model stu
+
+<div>
+    <h3>新增</h3>
+    <form method="post" action="~/insert/student" autocomplete="off">
+        學號：<input type="text" asp-for="stuno" />
+        系所：<input type="text" asp-for="deptno" />
+        姓名：<input type="text" asp-for="name" />
+        入學年：<input type="text" asp-for="entryYear" />
+        畢業年(可為空)：<input type="text" asp-for="gradDate" />
+        <input type="submit" />
+    </form>
+</div>
